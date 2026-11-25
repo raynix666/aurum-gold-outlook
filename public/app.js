@@ -54,6 +54,27 @@
     toastTimer = setTimeout(() => { $('notice').textContent = ''; }, 6500);
   }
 
+  const selectionGroups = document.querySelectorAll('.mast nav, #purity, #segments, #horizon-list');
+  let selectionFrame = 0;
+  function alignSelections() {
+    if (selectionFrame) return;
+    selectionFrame = requestAnimationFrame(() => {
+      selectionFrame = 0;
+      for (const group of selectionGroups) {
+        const control = group.querySelector('input:checked, [aria-pressed="true"], [aria-current="page"]');
+        const item = control?.closest('label, button, a');
+        if (!item || !item.offsetWidth) continue;
+        const bounds = item.getBoundingClientRect();
+        const track = group.getBoundingClientRect();
+        group.style.setProperty('--selection-x', (bounds.left - track.left - group.clientLeft) + 'px');
+        group.style.setProperty('--selection-y', (bounds.top - track.top - group.clientTop) + 'px');
+        group.style.setProperty('--selection-width', bounds.width + 'px');
+        group.style.setProperty('--selection-height', bounds.height + 'px');
+        group.classList.add('has-selection');
+      }
+    });
+  }
+
   function renderDate() {
     const last = asDate(rows.at(-1)[0]);
     const stale = Date.now() - last > 5 * DAY;
@@ -81,12 +102,20 @@
     $('month-high').textContent = price(Math.max(...trailing));
     renderDate();
     const selected = forecasts[horizonIndex];
-    $('segments').innerHTML = forecasts.map((h, i) =>
-      '<button type="button" data-index="' + i + '" aria-label="' + h.title + ' chart" aria-pressed="' + (i === horizonIndex) + '">' + h.short + '</button>'
-    ).join('');
-    // Keep each card's identity while prices update, including during a touch.
+    // Keep controls mounted so selection changes preserve focus and active gestures.
+    const segments = $('segments');
     const list = $('horizon-list');
     forecasts.forEach((h, i) => {
+      let segment = segments.children[i];
+      if (!segment) {
+        segment = document.createElement('button');
+        segment.type = 'button';
+        segment.dataset.index = i;
+        segments.append(segment);
+      }
+      segment.textContent = h.short;
+      segment.setAttribute('aria-label', h.title + ' chart');
+      segment.setAttribute('aria-pressed', String(i === horizonIndex));
       let card = list.children[i];
       if (!card) {
         card = document.createElement('button');
@@ -118,6 +147,7 @@
       h.baselineError.toFixed(2) + '%</td><td>' + h.count + '</td></tr>').join('');
     $('history-meta').textContent = rows.length.toLocaleString('en-US') + ' matched daily observations from ' + longDate.format(asDate(rows[0][0])) + ' through ' + longDate.format(time) + '. Vercel schedules a full model refit each day around 17:00 Amman time. On holidays and weekends, the forecast uses the latest published quote.';
     renderChart();
+    alignSelections();
   }
 
   function series() {
@@ -251,6 +281,7 @@
       else a.removeAttribute('aria-current');
     });
     document.title = method ? 'Methodology | Aurum' : 'Gold Forecast | Aurum';
+    alignSelections();
     requestAnimationFrame(renderChart);
   }
   window.addEventListener('hashchange', () => { navigate(); if (location.hash !== '#main') window.scrollTo(0, 0); });
@@ -310,6 +341,9 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden) update(); });
   setInterval(() => { if (!document.hidden) update(); }, 30 * 60 * 1000);
   new ResizeObserver(renderChart).observe($('chart-frame'));
+  const selectionResize = new ResizeObserver(alignSelections);
+  selectionGroups.forEach(group => selectionResize.observe(group));
+  document.fonts.ready.then(alignSelections);
   navigate();
   render();
   update();

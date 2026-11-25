@@ -163,3 +163,54 @@ footer{color:#b9b5ae}.footer-brand{color:#cec6b6}
 @media(prefers-reduced-motion:reduce),(prefers-reduced-transparency:reduce),(forced-colors:active){
   .horizon::before,.karat-options label > span::after {display:none}
 }
+
+/* A single highlight travels behind the labels in each selection group. */
+:is(.mast nav,.karat-options,.segments,#horizon-list) {
+  position:relative;
+  isolation:isolate;
+}
+.has-selection::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:-1;
+  pointer-events:none;
+  width:var(--selection-width);
+  height:var(--selection-height);
+  box-sizing:border-box;
+  border-radius:99px;
+  transform:translate(var(--selection-x),var(--selection-y));
+}
+:is(.karat-options,.segments).has-selection::before {
+  background:#eac58a linear-gradient(155deg,#ffe8b5 5%,#eac58a 53%,#c29b68);
+  box-shadow:inset 0 1px 2px #fff9,inset 0 -1px 1px #93714890,0 2px 6px #0003;
+}
+.mast nav.has-selection::before {
+  background:linear-gradient(150deg,#ffffff19,#ffffff06);
+  box-shadow:inset 0 1px 0 #fff4,inset 0 0 0 1px #ffffff17;
+}
+#horizon-list.has-selection::before {
+  border:1px solid #d6bd8857;
+  border-radius:14px;
+  background:linear-gradient(118deg,#dbbd8525,#c8ac7310 75%);
+  box-shadow:inset 0 1px 1px #ffefc415;
+}
+.karat-options.has-selection input:checked + span,
+.segments.has-selection button[aria-pressed=true],
+.mast nav.has-selection a[aria-current=page],
+#horizon-list.has-selection .horizon[aria-pressed=true] {
+  background:transparent;
+  box-shadow:none;
+}
+#horizon-list.has-selection .horizon[aria-pressed=true]:not([data-lit]) {border-color:transparent}
+@media(prefers-reduced-motion:no-preference) {
+  .has-selection::before {
+    --selection-ease:cubic-bezier(.22,.75,.22,1);
+    transition:transform 280ms var(--selection-ease),width 280ms var(--selection-ease),height 280ms var(--selection-ease);
+  }
+  .karat-options span,.segments button,.mast nav a {transition:color 170ms ease-out}
+}
+@media(forced-colors:active) {
+  .has-selection::before {border:2px solid Highlight}
+}
