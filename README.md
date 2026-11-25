@@ -2,6 +2,8 @@
 
 [Open the gold dashboard](https://aurum-gold-outlook.vercel.app/)
 
+Vercel builds each push to `main` and publishes successful builds at the dashboard link above.
+
 Aurum shows reference gold prices per gram in Jordanian dinars for 24K, 21K and 18K gold. Select a karat and a forecast horizon to explore the estimated price and historical error range for one week, one month or three months. The Methodology tab includes the model’s performance against a flat-price benchmark.
 
 ## Data and forecasts
