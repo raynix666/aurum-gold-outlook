@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "public/index.html"
+        ],
+        "createdAt": "2026-11-25T18:19:18.807Z",
+        "reason": "The two currency headings are native select option groups. The platform picker lays out their labels and options."
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "public/index.html"
+        ],
+        "createdAt": "2026-11-25T18:19:19.414Z",
+        "reason": "The fieldset groups the three mutually exclusive karat radio buttons inside the gold quote. The shared glass surround identifies the selector."
+      }
+    ]
+  }
+}
