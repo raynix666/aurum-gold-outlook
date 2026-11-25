@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101116">
+  <meta name="description" content="Explore machine-learning forecasts for the daily gold reference price over one week, one month and three months.">
+  <title>Aurum | Gold Forecast</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23171816'/%3E%3Cpath fill='%23e9bd67' d='m26 12 13 0 7 17H19zm-11 21h15l7 17H8zm19 0h15l8 17H41z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="glass-scene" aria-hidden="true"></canvas>
+  <svg class="symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="mark" viewBox="0 0 36 34"><path fill="currentColor" d="M13.4 2.8h9.4l3.8 9.7H9.5zM5 16h11l4.1 11H.8zm15.1 0h10.8l4 11h-10.7z"/></symbol>
+    <symbol id="refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M19.3 10a7.5 7.5 0 0 0-13-3M4.7 14a7.5 7.5 0 0 0 13 3"/></symbol>
+    <symbol id="calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18"/></symbol>
+    <symbol id="chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
+    <symbol id="ruler" viewBox="0 0 24 24"><path d="m4 15 11-11 5 5L9 20zM12 7l3 3M9 10l2 2M6 13l3 3"/></symbol>
+    <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></symbol>
+    <symbol id="trend" viewBox="0 0 24 24"><path d="m3 16 6-6 4 3 8-8m-6 0h6v6"/></symbol>
+    <symbol id="layers" viewBox="0 0 24 24"><path d="m3 8 9-5 9 5-9 5zm0 4 9 5 9-5M3 16l9 5 9-5"/></symbol>
+    <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.2"/></symbol>
+  </svg>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="mast">
+    <div class="mast-inner">
+      <a href="#overview" class="brand" aria-label="Aurum overview"><svg aria-hidden="true" viewBox="0 0 36 34"><use href="#mark"/></svg>Aurum</a>
+      <nav aria-label="Main navigation"><a href="#overview" data-nav="overview">Overview</a><a href="#methodology" data-nav="methodology">Methodology</a></nav>
+      <label class="unit"><svg class="icon"><use href="#ruler"/></svg><select id="units" aria-label="Currency and price unit"><optgroup label="Jordanian dinar"><option value="JOD-g">JOD / g</option><option value="JOD-oz">JOD / oz t</option><option value="JOD-kg">JOD / kg</option></optgroup><optgroup label="US dollar"><option value="USD-g">USD / g</option><option value="USD-oz">USD / oz t</option><option value="USD-kg">USD / kg</option></optgroup></select><svg class="icon small"><use href="#chevron"/></svg></label>
+    </div>
+  </header>
+  <main id="main" tabindex="-1">
+    <noscript>Enable JavaScript to calculate the gold forecasts.</noscript>
+    <section id="overview">
+      <div class="page-heading">
+        <div><h1>Gold forecast</h1><p>Daily reference prices and forecasts by karat.</p></div>
+        <div class="update"><div class="dates"><span id="as-of"></span><small id="calc-time"></small></div><button id="refresh-button" class="icon-button" aria-label="Refresh market data" title="Refresh market data"><svg class="icon"><use href="#refresh"/></svg></button></div>
+      </div>
+      <section class="quote" aria-label="Latest gold reference price">
+        <img src="bullion.webp" class="bullion" alt="" fetchpriority="high">
+        <div class="lens-fallback" aria-hidden="true"></div>
+        <div class="quote-content">
+          <div class="instrument"><span class="element" aria-hidden="true"><small>79</small>Au</span><div><h2 id="quote-title">24K gold reference price</h2><span id="gold-content">24 of 24 parts gold</span></div></div>
+          <fieldset id="purity" class="karat-options">
+            <legend>Gold purity</legend>
+            <label><input type="radio" name="karat" value="24" checked><span>24K</span></label>
+            <label><input type="radio" name="karat" value="21"><span>21K</span></label>
+            <label><input type="radio" name="karat" value="18"><span>18K</span></label>
+          </fieldset>
+          <div class="quote-price"><strong id="quote">—</strong><span id="per-unit">/ troy oz</span></div>
+          <div class="daily"><span id="daily-move"></span><span>vs. previous quote</span></div>
+          <div class="quote-meta"><div><span>1-month low</span><strong id="month-low">—</strong></div><div><span>1-month high</span><strong id="month-high">—</strong></div></div>
+        </div>
+      </section>
+      <div class="data-layout">
+        <section class="panel chart-panel" aria-labelledby="chart-title">
+          <div class="panel-head">
+            <div><h2 id="chart-title">Price trajectory</h2><p id="chart-subtitle">Historical prices and model projection</p></div>
+            <div id="segments" class="segments" role="group" aria-label="Chart horizon"></div>
+          </div>
+          <div class="chart-frame" id="chart-frame"><svg id="chart" aria-label="Gold price chart" role="img" tabindex="0"></svg><div id="tooltip" class="tooltip" hidden></div></div>
+          <div class="chart-footer"><div class="legend"><span><i class="historic"></i>Historical</span><span><i class="estimate"></i>Forecast</span><span><i class="band"></i>80% range</span></div><a id="export" class="text-action" download title="Download chart data as CSV" aria-label="Download chart data as CSV"><svg class="icon"><use href="#download"/></svg><span>CSV</span></a></div>
+        </section>
+        <section class="panel horizon-panel" aria-labelledby="horizons-title">
+          <div class="panel-head"><div><h2 id="horizons-title">Forecast horizons</h2><p id="forecast-unit">24K · JOD per gram</p></div><svg class="icon section-icon"><use href="#layers"/></svg></div>
+          <div id="horizon-list"></div>
+        </section>
+      </div>
+      <div class="range-detail"><div class="range-label"><svg class="icon"><use href="#trend"/></svg><h2 id="detail-title">Prediction range</h2></div><p id="range-copy"></p><a href="#methodology">How it’s calculated</a></div>
+      <section class="panel compare-panel" aria-labelledby="compare-title">
+        <div class="panel-head"><div><h2 id="compare-title">Compare karats</h2><p id="compare-description">Gold content value in JOD per gram. Jewellers may add premiums and making charges.</p></div></div>
+        <div class="table-wrap"><table aria-labelledby="compare-title" aria-describedby="compare-description">
+          <thead><tr><th scope="col">Karat</th><th scope="col">Latest</th><th scope="col">1 week</th><th scope="col">1 month</th><th scope="col">3 months</th></tr></thead>
+          <tbody id="karat-prices"></tbody>
+        </table></div>
+      </section>
+    </section>
+    <section id="methodology" hidden>
+      <div class="page-heading"><div><h1>Methodology</h1><p>How Aurum learns from past gold prices and measures forecast error.</p></div></div>
+      <section class="panel method-panel"><div class="panel-head"><div><h2>Historical performance</h2><p>Average absolute percentage error. Smaller values indicate closer estimates.</p></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Horizon</th><th>Model error</th><th>Flat-price error</th><th>Forecasts tested</th></tr></thead><tbody id="performance"></tbody></table></div><p class="table-note">Each test fits the model using only prices available on that forecast date. Test dates are five observations apart, so some forecast windows overlap.</p>
+      </section>
+      <div class="method-columns">
+        <article class="panel method-copy"><h2>Prices and currency</h2><p>Aurum converts Narodowy Bank Polski’s daily fine-gold price from złoty to US dollars at the same day’s exchange rate. One troy ounce weighs 31.1034768 grams.</p><p>JOD prices use a fixed reference conversion of 0.709 dinar per US dollar, halfway between the Central Bank of Jordan’s published USD rates of 708 and 710 fils. Local dealer prices can include premiums and making charges.</p><a href="https://www.cbj.gov.jo/EN/Pages/foreignexchangerates" target="_blank" rel="noreferrer">Central Bank of Jordan rates</a><p id="history-meta"></p><a href="https://api.nbp.pl/en.html" target="_blank" rel="noreferrer">NBP data documentation</a></article>
+        <article class="panel method-copy"><h2>Forecast model</h2><p>Three ridge-regression models learn from 5-, 20- and 60-observation price changes and recent volatility. Each model uses up to 1,008 historical observations and blends its estimate equally with the latest reference price.</p><p>Prices and forecast ranges scale with gold content. One gram of 21K contains 0.875 grams of pure gold, and one gram of 18K contains 0.750 grams. Both follow the percentage changes in the 24K forecast.</p><p>Targets fall one week, one calendar month and three calendar months after the last quote. For historical targets on a market holiday, the model uses the last available quote on or before the target date.</p></article>
+        <article class="panel method-copy"><h2>Reading the range</h2><p>Each endpoint range uses the 80th percentile of absolute historical log-price errors from rolling forecasts. It shows the scale of past misses. Future prices can move outside it.</p><p>The chart interpolates between horizon estimates in log-price space. The band between targets is illustrative. Unexpected events and changes in market conditions can affect accuracy.</p></article>
+      </div>
+    </section>
+    <footer><div class="footer-links"><span class="footer-brand"><svg viewBox="0 0 36 34" aria-hidden="true"><use href="#mark"/></svg>Aurum</span><a href="https://github.com/raynix666/aurum-gold-outlook" target="_blank" rel="noreferrer" aria-label="Aurum source code on GitHub">GitHub</a></div><span>Daily reference data from <a href="https://api.nbp.pl/en.html" target="_blank" rel="noreferrer">NBP</a>. Forecasts are estimates.</span></footer>
+  </main>
+  <div id="notice" role="status" aria-live="polite"></div>
+  <script src="seed.js"></script>
+  <script src="app.js"></script>
+  <script src="glass.js"></script>
+</body>
+</html>
